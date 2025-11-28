@@ -10,7 +10,7 @@ class AppSizes {
   static const double width55 = 55.0;
 
   static const double toolBarHeight = 72.0;
-  static const double attendanceHeight = 210;
+  static const double attendanceHeight = 220;
   static const double expandedHeight = 220;
 
   // SIZE FOR IMAGE
@@ -27,6 +27,11 @@ class AppSizes {
   static const double paddingSixteen = 16.0;
   static const double paddingFourteen = 14.0;
   static const double radius24 = 24.0;
-
+  static const double size30 = 30.0;
   static const double size32 = 32.0;
+  static const double size36 = 36.0;
+  static const double size60 = 60.0;
+  static const double size70 = 70.0;
+  static const double size80 = 80.0;
+  static const double size100 = 100.0;
 }

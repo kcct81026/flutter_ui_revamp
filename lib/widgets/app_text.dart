@@ -25,6 +25,9 @@ class TextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // get inherited/default text style color
+    final Color? inheritedColor = DefaultTextStyle.of(context).style.color;
+
     return Text(
       text,
       textAlign: textAlign,
@@ -34,8 +37,8 @@ class TextWidget extends StatelessWidget {
         fontFamily: 'Inter',
         fontSize: fontSize,
         fontWeight: isBold ? FontWeight.bold : fontWeight,
-        color: color ?? Colors.black,
-        height: 1.3, // for slightly nicer spacing
+        // use provided color if not null, otherwise fall back to inherited color
+        color: color ?? inheritedColor ?? Colors.black,
       ),
     );
   }

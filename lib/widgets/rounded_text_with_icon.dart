@@ -8,12 +8,11 @@ class RoundedTextIconWidget extends StatelessWidget {
   final Color borderColor;
   final Color backgroundColor;
   final double borderRadius;
-  final Color rightBackgroundColor;
 
   final String? leftAsset;
   final String? rightAsset;
-
   final double leftImageSize;
+  final Color rightBackgroundColor;
 
   const RoundedTextIconWidget({
     Key? key,
@@ -28,12 +27,28 @@ class RoundedTextIconWidget extends StatelessWidget {
     this.rightBackgroundColor = AppColors.blue90,
   }) : super(key: key);
 
+  static const double _rightIconBoxSize = AppSizes.size32;
+
   bool _hasAsset(String? a) => a != null && a.trim().isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     final hasLeft = _hasAsset(leftAsset);
     final hasRight = _hasAsset(rightAsset);
+
+    // base horizontal padding on the left side (you can tweak)
+    const double horizontalLeftPadding = AppSizes.paddingTwelve;
+
+    // If we have a right icon we want it flush to the container's right edge,
+    // therefore container.right padding is 0. But we still must reserve space
+    // inside the centered area so text won't go under the right icon. We do that
+    // by adding an inner right padding equal to _rightIconBoxSize on the centered child.
+    final EdgeInsets containerPadding = EdgeInsets.only(
+      left: horizontalLeftPadding,
+      right: hasRight ? 0 : horizontalLeftPadding,
+      top: 4,
+      bottom: 4,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -44,45 +59,59 @@ class RoundedTextIconWidget extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // --- Centered Row (left icon + text) ---
-          Align(
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisSize:
-                  MainAxisSize.min, // allow text to take natural width
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (hasLeft)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: AppSizes.paddingEight,
+          // apply padding ONLY around centered area
+          Padding(
+            padding: EdgeInsets.only(
+              left: horizontalLeftPadding,
+              right: hasRight ? _rightIconBoxSize : horizontalLeftPadding,
+              top: 4,
+              bottom: 4,
+            ),
+            child: Align(
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (hasLeft)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        right: AppSizes.paddingEight,
+                      ),
+                      child: Image.asset(
+                        leftAsset!,
+                        height: leftImageSize,
+                        width: leftImageSize,
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                    child: Image.asset(
-                      leftAsset!,
-                      height: AppSizes.paddingFourteen,
-                      width: AppSizes.paddingFourteen,
-                      fit: BoxFit.contain,
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 0,
+                        maxWidth: double.infinity,
+                      ),
+                      child: child,
                     ),
                   ),
-                // Text should show fully
-                child,
-              ],
+                ],
+              ),
             ),
           ),
 
-          // --- Right icon (if any) ---
+          // Right icon stays flush — no padding now
           if (hasRight)
             Positioned(
               right: 0,
+              top: 0,
+              bottom: 0,
               child: Container(
-                width: AppSizes.size32,
-                height: AppSizes.size32,
+                width: _rightIconBoxSize,
                 decoration: BoxDecoration(
                   color: rightBackgroundColor,
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(AppSizes.paddingEight),
-                    bottomRight: Radius.circular(AppSizes.paddingEight),
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(borderRadius),
+                    bottomRight: Radius.circular(borderRadius),
                   ),
                 ),
                 child: Center(
