@@ -22,4 +22,7 @@ class AppIcons {
   static const String event = "assets/icons/event.png";
   static const String importantDaysHearts =
       "assets/icons/importantDaysHearts.png";
+  static const String promotion = "assets/icons/promotion.png";
+  static const String more = "assets/icons/more_vert.png";
+  static const String previewImage = "assets/image_placeholder/preview.png";
 }

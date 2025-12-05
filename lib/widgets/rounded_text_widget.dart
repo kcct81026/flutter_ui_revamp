@@ -17,7 +17,7 @@ class RoundedTextViewWidget extends StatelessWidget {
   final VoidCallback? onTap;
 
   const RoundedTextViewWidget({
-    Key? key,
+    super.key,
     required this.child,
     this.showDot = false,
     this.showBorder = true,
@@ -30,7 +30,7 @@ class RoundedTextViewWidget extends StatelessWidget {
     this.borderRadius = AppSizes.paddingTwelve,
     this.isSelected = false,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

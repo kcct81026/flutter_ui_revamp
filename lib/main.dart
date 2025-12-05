@@ -1,6 +1,7 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:yc_ui/sliverlist_main_page.dart';
+import 'package:yc_ui/constants/dummy.dart';
+import 'package:yc_ui/social_feed/social_feed.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
       ),
-      home: const SliverListMainPage(),
+      home: SocialFeedScreen(items: dummyFeedItems),
       debugShowCheckedModeBanner: false,
     );
   }

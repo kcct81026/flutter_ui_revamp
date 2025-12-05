@@ -8,7 +8,7 @@ import 'package:yc_ui/widgets/rounded_text_widget.dart';
 import 'package:yc_ui/widgets/rounded_text_with_icon.dart';
 
 class WidgetImportantdays extends StatefulWidget {
-  const WidgetImportantdays({Key? key}) : super(key: key);
+  const WidgetImportantdays({super.key});
 
   @override
   State<WidgetImportantdays> createState() => _WidgetImportantdaysState();

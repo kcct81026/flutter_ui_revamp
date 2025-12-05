@@ -15,7 +15,7 @@ class CheckinoutWidget extends StatelessWidget {
   final Widget progress;
 
   const CheckinoutWidget({
-    Key? key,
+    super.key,
     required this.dateText,
     required this.arrivalStatus,
     required this.checkInTime,
@@ -23,7 +23,7 @@ class CheckinoutWidget extends StatelessWidget {
     required this.progress,
     required this.isToday,
     this.islate = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import 'package:yc_ui/constants/app_sizes.dart';
 class ProgressBarWidget extends StatelessWidget {
   final double progress;
 
-  const ProgressBarWidget({Key? key, required this.progress}) : super(key: key);
+  const ProgressBarWidget({super.key, required this.progress});
 
   @override
   Widget build(BuildContext context) {

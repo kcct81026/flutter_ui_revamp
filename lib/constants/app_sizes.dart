@@ -27,9 +27,11 @@ class AppSizes {
   static const double paddingSixteen = 16.0;
   static const double paddingFourteen = 14.0;
   static const double radius24 = 24.0;
+  static const double size28 = 28.0;
   static const double size30 = 30.0;
   static const double size32 = 32.0;
   static const double size36 = 36.0;
+  static const double size40 = 40.0;
   static const double size60 = 60.0;
   static const double size70 = 70.0;
   static const double size80 = 80.0;

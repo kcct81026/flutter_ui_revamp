@@ -15,7 +15,7 @@ class RoundedTextIconWidget extends StatelessWidget {
   final Color rightBackgroundColor;
 
   const RoundedTextIconWidget({
-    Key? key,
+    super.key,
     required this.child,
     this.showBorder = false,
     this.borderColor = Colors.transparent,
@@ -25,7 +25,7 @@ class RoundedTextIconWidget extends StatelessWidget {
     this.rightAsset,
     this.leftImageSize = AppSizes.paddingSixteen,
     this.rightBackgroundColor = AppColors.blue90,
-  }) : super(key: key);
+  });
 
   static const double _rightIconBoxSize = AppSizes.size32;
 

@@ -24,7 +24,7 @@ class CheckinDemoData {
 
 class CheckinSwitcher extends StatefulWidget {
   final List<CheckinDemoData>? pages;
-  const CheckinSwitcher({Key? key, this.pages}) : super(key: key);
+  const CheckinSwitcher({super.key, this.pages});
 
   @override
   State<CheckinSwitcher> createState() => _CheckinSwitcherState();

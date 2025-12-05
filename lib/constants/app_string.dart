@@ -23,4 +23,5 @@ class AppString {
   static const String brithday = "Birthday";
   static const String anniversary = "Work Anniversary";
   static const String upcomingHolidays = "Upcoming Holidays";
+  static const String promotion = "Promotion";
 }

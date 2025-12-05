@@ -11,11 +11,11 @@ class EventWidget extends StatelessWidget {
   final double iconBoxSize;
 
   const EventWidget({
-    Key? key,
+    super.key,
     required this.item,
     this.onTap,
     this.iconBoxSize = AppSizes.iconSizeFourtyTwo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

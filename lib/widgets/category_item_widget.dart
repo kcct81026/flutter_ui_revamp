@@ -11,13 +11,13 @@ class CategoryItemWidget extends StatelessWidget {
   final VoidCallback? onTap;
 
   const CategoryItemWidget({
-    Key? key,
+    super.key,
     required this.label,
     required this.iconAsset,
     this.backgroundColor = Colors.white,
     this.cornerRadius = AppSizes.paddingEight,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
