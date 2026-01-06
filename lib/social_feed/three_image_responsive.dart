@@ -1,7 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:yc_ui/constants/app_colors.dart';
-import 'package:yc_ui/constants/app_sizes.dart';
+import 'package:yc_ui/social_feed/responsive_cache_image.dart';
 
 class ThreeImageResponsive extends StatefulWidget {
   final List<String> urls;
@@ -9,6 +7,7 @@ class ThreeImageResponsive extends StatefulWidget {
   final String? fallbackAssetPath;
   final void Function(int index) onTap;
   final double spacing;
+  final String? heroTagPrefix;
 
   const ThreeImageResponsive({
     Key? key,
@@ -17,6 +16,7 @@ class ThreeImageResponsive extends StatefulWidget {
     required this.fallbackAssetPath,
     required this.onTap,
     required this.spacing,
+    this.heroTagPrefix,
   }) : assert(urls.length == 3, 'ThreeImageResponsive requires exactly 3 urls'),
        super(key: key);
 
@@ -25,7 +25,8 @@ class ThreeImageResponsive extends StatefulWidget {
 }
 
 class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
-  bool? _firstIsPortrait;
+  double? _firstWidth;
+  double? _firstHeight;
 
   ImageStream? _imageStream;
   ImageStreamListener? _imageStreamListener;
@@ -33,28 +34,53 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
   @override
   void initState() {
     super.initState();
-    _checkFirstImage();
+    _resolveFirstImage();
   }
 
-  void _checkFirstImage() {
-    final provider = NetworkImage(widget.urls.first);
-    final stream = provider.resolve(const ImageConfiguration());
-    _imageStream = stream;
+  void _resolveFirstImage() {
+    try {
+      final provider = NetworkImage(widget.urls.first);
+      final stream = provider.resolve(const ImageConfiguration());
+      _imageStream = stream;
 
-    _imageStreamListener = ImageStreamListener(
-      (ImageInfo info, bool _) {
-        final w = info.image.width.toDouble();
-        final h = info.image.height.toDouble();
-        if (!mounted) return;
-        setState(() => _firstIsPortrait = h > w);
-      },
-      onError: (dynamic _, StackTrace? __) {
-        if (!mounted) return;
-        setState(() => _firstIsPortrait = false);
-      },
-    );
+      _imageStreamListener = ImageStreamListener(
+        (info, _) {
+          final w = info.image.width.toDouble();
+          final h = info.image.height.toDouble();
+          if (!mounted) return;
 
-    stream.addListener(_imageStreamListener!);
+          setState(() {
+            _firstWidth = w;
+            _firstHeight = h;
+          });
+
+          // remove listener after first frame
+          try {
+            if (_imageStream != null && _imageStreamListener != null) {
+              _imageStream!.removeListener(_imageStreamListener!);
+            }
+          } catch (_) {}
+          _imageStream = null;
+          _imageStreamListener = null;
+        },
+        onError: (dynamic _, StackTrace? __) {
+          if (!mounted) return;
+          setState(() {
+            _firstWidth = 1;
+            _firstHeight = 1;
+          });
+        },
+      );
+
+      stream.addListener(_imageStreamListener!);
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _firstWidth = 1;
+          _firstHeight = 1;
+        });
+      }
+    }
   }
 
   @override
@@ -69,39 +95,42 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
     super.dispose();
   }
 
-  Widget _buildCached(String url, int index, {BoxFit fit = BoxFit.cover}) {
-    return GestureDetector(
-      onTap: () => widget.onTap(index),
-      child: CachedNetworkImage(
-        imageUrl: url,
-        fit: fit,
-        placeholder: (ctx, url) => Container(
-          color: AppColors.grey20,
-          alignment: Alignment.center,
-          child: const SizedBox(
-            width: AppSizes.size28,
-            height: AppSizes.size28,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-        errorWidget: (ctx, url, error) => widget.fallbackAssetPath != null
-            ? Image.asset(widget.fallbackAssetPath!, fit: BoxFit.cover)
-            : Container(
-                color: AppColors.grey20,
-                alignment: Alignment.center,
-                child: const Icon(Icons.broken_image, size: AppSizes.size36),
-              ),
-      ),
-    );
+  String? _heroTagFor(int index) {
+    final p = widget.heroTagPrefix;
+    if (p == null) return null;
+    return '$p-$index-${widget.urls[index]}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait = _firstIsPortrait ?? false;
+    // Determine type from resolved first image
+    final hasDims = _firstWidth != null && _firstHeight != null;
+    final bool isPortrait;
+    final bool isSquare;
+    final bool isLandscape;
 
-    final topLandscapeAspect = 75.0 / 49.0; // width/height
-    final portraitAspect = 2.0 / 3.0; // width/height (0.666..)
-    final squareAspect = 1.0;
+    if (!hasDims) {
+      // default to square (avoids super-tall placeholders before resolve)
+      isSquare = true;
+      isPortrait = false;
+      isLandscape = false;
+    } else {
+      final w = _firstWidth!;
+      final h = _firstHeight!;
+      if (w == h) {
+        isSquare = true;
+        isPortrait = false;
+        isLandscape = false;
+      } else if (h > w) {
+        isPortrait = true;
+        isSquare = false;
+        isLandscape = false;
+      } else {
+        isLandscape = true;
+        isSquare = false;
+        isPortrait = false;
+      }
+    }
 
     return Padding(
       padding: EdgeInsets.only(top: widget.spacing),
@@ -111,62 +140,88 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
           final s = widget.spacing;
 
           if (isPortrait) {
+            // Portrait layout:
+
             final numerator = 1.5 * totalWidth - 2.5 * s;
-            final denom = 4.5;
+            const denom = 4.5;
             double rightWidth = numerator / denom;
 
-            // safety fallback if available width small — use half-and-half
             if (rightWidth <= 0 || rightWidth.isNaN || rightWidth.isInfinite) {
-              final half = (totalWidth - s) / 2.0;
-              rightWidth = half;
+              rightWidth = (totalWidth - s) / 2.0;
             }
 
             final leftWidth = totalWidth - s - rightWidth;
-
-            final rightImageHeight = rightWidth * 1.5;
+            final rightImageHeight = rightWidth * 1.5; // 2:3 -> h = w * 1.5
             final totalRightHeight = rightImageHeight * 2 + s;
-            final leftHeight = leftWidth * 1.5;
-
             final finalLeftHeight = totalRightHeight;
 
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // LEFT (img0)
+                // Left large image (img0)
                 SizedBox(
                   width: leftWidth,
                   height: finalLeftHeight,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(widget.borderRadius),
-                    child: _buildCached(widget.urls[0], 0),
+                    child: ResponsiveCachedImage(
+                      url: widget.urls[0],
+                      borderRadius: widget.borderRadius,
+                      fallbackAssetPath: widget.fallbackAssetPath,
+                      onTap: () => widget.onTap(0),
+                      fit: BoxFit.cover,
+                      heroTag: _heroTagFor(0),
+                      width: leftWidth,
+                      height: finalLeftHeight,
+                    ),
                   ),
                 ),
 
                 SizedBox(width: s),
 
-                // RIGHT column: two 2:3 images stacked
+                // Right column: two stacked 2:3 images (img1, img2)
                 SizedBox(
                   width: rightWidth,
                   height: finalLeftHeight,
                   child: Column(
                     children: [
                       SizedBox(
+                        width: rightWidth,
                         height: rightImageHeight,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(
                             widget.borderRadius,
                           ),
-                          child: _buildCached(widget.urls[1], 1),
+                          child: ResponsiveCachedImage(
+                            url: widget.urls[1],
+                            borderRadius: widget.borderRadius,
+                            fallbackAssetPath: widget.fallbackAssetPath,
+                            onTap: () => widget.onTap(1),
+                            fit: BoxFit.cover,
+                            heroTag: _heroTagFor(1),
+                            width: rightWidth,
+                            height: rightImageHeight,
+                          ),
                         ),
                       ),
                       SizedBox(height: s),
                       SizedBox(
+                        width: rightWidth,
                         height: rightImageHeight,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(
                             widget.borderRadius,
                           ),
-                          child: _buildCached(widget.urls[2], 2),
+                          child: ResponsiveCachedImage(
+                            url: widget.urls[2],
+                            borderRadius: widget.borderRadius,
+                            fallbackAssetPath: widget.fallbackAssetPath,
+                            onTap: () => widget.onTap(2),
+                            fit: BoxFit.cover,
+                            heroTag: _heroTagFor(2),
+                            width: rightWidth,
+                            height: rightImageHeight,
+                          ),
                         ),
                       ),
                     ],
@@ -175,10 +230,11 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
               ],
             );
           } else {
-            // landscape case unchanged
-            final topHeight = totalWidth / topLandscapeAspect;
+            // Non-portrait: choose top aspect depending on square vs landscape
+            final topAspect = isSquare ? (75.0 / 49.0) : (2.0 / 1.0);
+            final topHeight = totalWidth / topAspect; // height = width / (w/h)
             final bottomChildWidth = (totalWidth - s) / 2.0;
-            final bottomChildHeight = bottomChildWidth; // square
+            final bottomChildHeight = bottomChildWidth; // 1:1
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -188,7 +244,16 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
                   height: topHeight,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(widget.borderRadius),
-                    child: _buildCached(widget.urls[0], 0),
+                    child: ResponsiveCachedImage(
+                      url: widget.urls[0],
+                      borderRadius: widget.borderRadius,
+                      fallbackAssetPath: widget.fallbackAssetPath,
+                      onTap: () => widget.onTap(0),
+                      fit: BoxFit.cover,
+                      heroTag: _heroTagFor(0),
+                      width: totalWidth,
+                      height: topHeight,
+                    ),
                   ),
                 ),
                 SizedBox(height: s),
@@ -201,7 +266,16 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
                         borderRadius: BorderRadius.circular(
                           widget.borderRadius,
                         ),
-                        child: _buildCached(widget.urls[1], 1),
+                        child: ResponsiveCachedImage(
+                          url: widget.urls[1],
+                          borderRadius: widget.borderRadius,
+                          fallbackAssetPath: widget.fallbackAssetPath,
+                          onTap: () => widget.onTap(1),
+                          fit: BoxFit.cover,
+                          heroTag: _heroTagFor(1),
+                          width: bottomChildWidth,
+                          height: bottomChildHeight,
+                        ),
                       ),
                     ),
                     SizedBox(width: s),
@@ -212,7 +286,16 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
                         borderRadius: BorderRadius.circular(
                           widget.borderRadius,
                         ),
-                        child: _buildCached(widget.urls[2], 2),
+                        child: ResponsiveCachedImage(
+                          url: widget.urls[2],
+                          borderRadius: widget.borderRadius,
+                          fallbackAssetPath: widget.fallbackAssetPath,
+                          onTap: () => widget.onTap(2),
+                          fit: BoxFit.cover,
+                          heroTag: _heroTagFor(2),
+                          width: bottomChildWidth,
+                          height: bottomChildHeight,
+                        ),
                       ),
                     ),
                   ],
