@@ -11,15 +11,14 @@ class MultipleImageResponsive extends StatefulWidget {
   final String? heroTagPrefix;
 
   const MultipleImageResponsive({
-    Key? key,
+    super.key,
     required this.urls,
     required this.borderRadius,
     required this.fallbackAssetPath,
     required this.onTap,
     this.spacing = AppSizes.paddingTwelve,
     this.heroTagPrefix,
-  }) : assert(urls.length >= 1, 'At least one image is required'),
-       super(key: key);
+  }) : assert(urls.length >= 1);
 
   @override
   State<MultipleImageResponsive> createState() =>
@@ -30,9 +29,6 @@ class _MultipleImageResponsiveState extends State<MultipleImageResponsive> {
   double? _firstWidth;
   double? _firstHeight;
 
-  ImageStream? _imageStream;
-  ImageStreamListener? _imageStreamListener;
-
   static const int maxSlots = 5;
 
   @override
@@ -42,60 +38,18 @@ class _MultipleImageResponsiveState extends State<MultipleImageResponsive> {
   }
 
   void _resolveFirstImage() {
-    try {
-      final provider = NetworkImage(widget.urls.first);
-      final stream = provider.resolve(const ImageConfiguration());
-      _imageStream = stream;
-
-      _imageStreamListener = ImageStreamListener(
-        (info, _) {
-          final w = info.image.width.toDouble();
-          final h = info.image.height.toDouble();
-          if (!mounted) return;
-
-          setState(() {
-            _firstWidth = w;
-            _firstHeight = h;
-          });
-
-          try {
-            if (_imageStream != null && _imageStreamListener != null) {
-              _imageStream!.removeListener(_imageStreamListener!);
-            }
-          } catch (_) {}
-          _imageStream = null;
-          _imageStreamListener = null;
-        },
-        onError: (dynamic _, StackTrace? __) {
-          if (!mounted) return;
-          setState(() {
-            _firstWidth = 1;
-            _firstHeight = 1;
-          });
-        },
-      );
-
-      stream.addListener(_imageStreamListener!);
-    } catch (_) {
-      if (mounted) {
-        setState(() {
-          _firstWidth = 1;
-          _firstHeight = 1;
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    try {
-      if (_imageStream != null && _imageStreamListener != null) {
-        _imageStream!.removeListener(_imageStreamListener!);
-      }
-    } catch (_) {}
-    _imageStream = null;
-    _imageStreamListener = null;
-    super.dispose();
+    final provider = NetworkImage(widget.urls.first);
+    provider
+        .resolve(const ImageConfiguration())
+        .addListener(
+          ImageStreamListener((info, _) {
+            if (!mounted) return;
+            setState(() {
+              _firstWidth = info.image.width.toDouble();
+              _firstHeight = info.image.height.toDouble();
+            });
+          }),
+        );
   }
 
   String? _heroTagFor(int index) {
@@ -104,63 +58,68 @@ class _MultipleImageResponsiveState extends State<MultipleImageResponsive> {
     return '$p-$index-${widget.urls[index]}';
   }
 
-  Widget _fullOverlayedTile({
-    required Widget imageChild,
-    required int indexToTap,
-    required int totalCount,
-    required double borderRadius,
+  Widget _tile({
+    required double width,
+    required double height,
+    required int index,
+    required int total,
   }) {
-    final extras = totalCount - maxSlots;
-    final shouldOverlay = totalCount > maxSlots && extras > 0;
+    if (index >= total) {
+      return SizedBox(width: width, height: height);
+    }
 
-    if (!shouldOverlay) return imageChild;
+    final image = ResponsiveCachedImage(
+      url: widget.urls[index],
+      borderRadius: widget.borderRadius,
+      fallbackAssetPath: widget.fallbackAssetPath,
+      onTap: () => widget.onTap(index),
+      heroTag: _heroTagFor(index),
+      width: width,
+      height: height,
+    );
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        imageChild,
-        Positioned.fill(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => widget.onTap(indexToTap),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.45),
-                  borderRadius: BorderRadius.circular(borderRadius),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '+${extras}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: AppSizes.medium,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Inter',
-                    shadows: [
-                      Shadow(
-                        blurRadius: 6,
-                        color: Colors.black45,
-                        offset: const Offset(0, 2),
+    // Overlay +N only on last visible tile
+    if (index == 4 && total > maxSlots) {
+      final extra = total - maxSlots;
+
+      return SizedBox(
+        width: width,
+        height: height,
+        child: Stack(
+          children: [
+            image,
+            Positioned.fill(
+              child: Material(
+                color: Colors.black.withValues(alpha: 0.45),
+                child: InkWell(
+                  onTap: () => widget.onTap(index),
+                  child: Center(
+                    child: Text(
+                      '+$extra',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
-      ],
-    );
+      );
+    }
+
+    return SizedBox(width: width, height: height, child: image);
   }
 
   @override
   Widget build(BuildContext context) {
     final total = widget.urls.length;
-    final slotsToShow = total >= maxSlots ? maxSlots : total;
-    final hasDims = _firstWidth != null && _firstHeight != null;
-    final bool isLandscape = hasDims ? (_firstWidth! > _firstHeight!) : false;
+    final isLandscape = _firstWidth != null && _firstHeight != null
+        ? _firstWidth! > _firstHeight!
+        : false;
 
     return Padding(
       padding: EdgeInsets.only(top: widget.spacing),
@@ -169,208 +128,118 @@ class _MultipleImageResponsiveState extends State<MultipleImageResponsive> {
           final totalWidth = constraints.maxWidth;
           final s = widget.spacing;
 
+          // -------------------------
+          // PORTRAIT / SQUARE LAYOUT
+          // -------------------------
           if (!isLandscape) {
-            // Square / Portrait layout:
-            final topW = (totalWidth - s) / 2.0;
+            final topW = (totalWidth - s) / 2;
             final topH = topW;
-            final bottomChildW = (totalWidth - 2 * s) / 3.0;
-            final bottomChildH = bottomChildW;
 
-            Widget topTile(int slotIdx) {
-              if (slotIdx >= slotsToShow)
-                return SizedBox(width: topW, height: topH);
-              final image = ResponsiveCachedImage(
-                url: widget.urls[slotIdx],
-                borderRadius: widget.borderRadius,
-                fallbackAssetPath: widget.fallbackAssetPath,
-                onTap: () => widget.onTap(slotIdx),
-                fit: BoxFit.cover,
-                heroTag: _heroTagFor(slotIdx),
-                width: topW,
-                height: topH,
-              );
-              if (slotIdx == 4 && total > maxSlots) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(widget.borderRadius),
-                  child: _fullOverlayedTile(
-                    imageChild: image,
-                    indexToTap: 4,
-                    totalCount: total,
-                    borderRadius: widget.borderRadius,
-                  ),
-                );
-              }
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                child: image,
-              );
-            }
-
-            Widget bottomTile(int slotIdx) {
-              if (slotIdx >= slotsToShow)
-                return SizedBox(width: bottomChildW, height: bottomChildH);
-              final image = ResponsiveCachedImage(
-                url: widget.urls[slotIdx],
-                borderRadius: widget.borderRadius,
-                fallbackAssetPath: widget.fallbackAssetPath,
-                onTap: () => widget.onTap(slotIdx),
-                fit: BoxFit.cover,
-                heroTag: _heroTagFor(slotIdx),
-                width: bottomChildW,
-                height: bottomChildH,
-              );
-              if (slotIdx == 4 && total > maxSlots) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(widget.borderRadius),
-                  child: _fullOverlayedTile(
-                    imageChild: image,
-                    indexToTap: 4,
-                    totalCount: total,
-                    borderRadius: widget.borderRadius,
-                  ),
-                );
-              }
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                child: image,
-              );
-            }
+            final bottomW = (totalWidth - (2 * s)) / 3;
+            final bottomH = bottomW;
 
             return Column(
               children: [
                 Row(
                   children: [
-                    topTile(0),
+                    _tile(width: topW, height: topH, index: 0, total: total),
                     SizedBox(width: s),
-                    topTile(1),
+                    _tile(width: topW, height: topH, index: 1, total: total),
                   ],
                 ),
                 SizedBox(height: s),
                 Row(
                   children: [
-                    bottomTile(2),
+                    _tile(
+                      width: bottomW,
+                      height: bottomH,
+                      index: 2,
+                      total: total,
+                    ),
                     SizedBox(width: s),
-                    bottomTile(3),
+                    _tile(
+                      width: bottomW,
+                      height: bottomH,
+                      index: 3,
+                      total: total,
+                    ),
                     SizedBox(width: s),
-                    bottomTile(4),
-                  ],
-                ),
-              ],
-            );
-          } else {
-            // LANDSCAPE: force left and right columns equal width = (totalWidth - s) / 2
-            final columnW = (totalWidth - s) / 2.0;
-            final leftTileSize = columnW; // left squares (1:1)
-            // rightTileHeight chosen so total heights match:
-            // 2*leftTileSize + s == 3*rightTileHeight + 2*s
-            var rightTileHeight = (2.0 * leftTileSize - s) / 3.0;
-            if (rightTileHeight.isNaN || rightTileHeight <= 0) {
-              rightTileHeight = leftTileSize * (2.0 / 3.0); // fallback
-            }
-
-            // Right column uses images 2,3,4 (top->mid->bottom)
-            Widget rightTileForSlot(int slotIndex) {
-              final imgIndex = 2 + slotIndex;
-              if (imgIndex >= total)
-                return SizedBox(width: columnW, height: rightTileHeight);
-              final image = ResponsiveCachedImage(
-                url: widget.urls[imgIndex],
-                borderRadius: widget.borderRadius,
-                fallbackAssetPath: widget.fallbackAssetPath,
-                onTap: () => widget.onTap(imgIndex),
-                fit: BoxFit.cover,
-                heroTag: _heroTagFor(imgIndex),
-                width: columnW,
-                height: rightTileHeight,
-              );
-
-              // overlay appears on right-bottom tile (slotIndex==2) when extras
-              if (slotIndex == 2 && total > maxSlots) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(widget.borderRadius),
-                  child: _fullOverlayedTile(
-                    imageChild: image,
-                    indexToTap: imgIndex, // will be 4 when total>=5
-                    totalCount: total,
-                    borderRadius: widget.borderRadius,
-                  ),
-                );
-              }
-
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                child: image,
-              );
-            }
-
-            // Left column: image 0 (top) and image 1 (bottom)
-            Widget leftTop() {
-              final idx = 0;
-              if (idx >= total)
-                return SizedBox(width: columnW, height: leftTileSize);
-              final image = ResponsiveCachedImage(
-                url: widget.urls[idx],
-                borderRadius: widget.borderRadius,
-                fallbackAssetPath: widget.fallbackAssetPath,
-                onTap: () => widget.onTap(idx),
-                fit: BoxFit.cover,
-                heroTag: _heroTagFor(idx),
-                width: columnW,
-                height: leftTileSize,
-              );
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                child: image,
-              );
-            }
-
-            Widget leftBottom() {
-              final idx = 1;
-              if (idx >= total)
-                return SizedBox(width: columnW, height: leftTileSize);
-              final image = ResponsiveCachedImage(
-                url: widget.urls[idx],
-                borderRadius: widget.borderRadius,
-                fallbackAssetPath: widget.fallbackAssetPath,
-                onTap: () => widget.onTap(idx),
-                fit: BoxFit.cover,
-                heroTag: _heroTagFor(idx),
-                width: columnW,
-                height: leftTileSize,
-              );
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                child: image,
-              );
-            }
-
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left column: two squares with one spacing between -> total = 2*leftTileSize + s
-                Column(
-                  children: [
-                    leftTop(),
-                    SizedBox(height: s),
-                    leftBottom(),
-                  ],
-                ),
-
-                SizedBox(width: s),
-
-                // Right column: three tiles stacked with two spacings -> total = 3*rightTileHeight + 2*s
-                Column(
-                  children: [
-                    rightTileForSlot(0),
-                    SizedBox(height: s),
-                    rightTileForSlot(1),
-                    SizedBox(height: s),
-                    rightTileForSlot(2),
+                    _tile(
+                      width: bottomW,
+                      height: bottomH,
+                      index: 4,
+                      total: total,
+                    ),
                   ],
                 ),
               ],
             );
           }
+
+          // -------------------------
+          // LANDSCAPE LAYOUT
+          // -------------------------
+
+          final columnWidth = (totalWidth - s) / 2;
+
+          final leftTileSize = columnWidth;
+
+          // height match math:
+          // 2*left + s = 3*right + 2*s
+          // => right = (2*left - s) / 3
+          final rightTileHeight = (2 * leftTileSize - s) / 3;
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // LEFT COLUMN
+              Column(
+                children: [
+                  _tile(
+                    width: columnWidth,
+                    height: leftTileSize,
+                    index: 0,
+                    total: total,
+                  ),
+                  SizedBox(height: s),
+                  _tile(
+                    width: columnWidth,
+                    height: leftTileSize,
+                    index: 1,
+                    total: total,
+                  ),
+                ],
+              ),
+
+              SizedBox(width: s),
+
+              // RIGHT COLUMN
+              Column(
+                children: [
+                  _tile(
+                    width: columnWidth,
+                    height: rightTileHeight,
+                    index: 2,
+                    total: total,
+                  ),
+                  SizedBox(height: s),
+                  _tile(
+                    width: columnWidth,
+                    height: rightTileHeight,
+                    index: 3,
+                    total: total,
+                  ),
+                  SizedBox(height: s),
+                  _tile(
+                    width: columnWidth,
+                    height: rightTileHeight,
+                    index: 4,
+                    total: total,
+                  ),
+                ],
+              ),
+            ],
+          );
         },
       ),
     );

@@ -1,3 +1,9 @@
+List<FeedItemModel> generateFeed(int count) {
+  return List.generate(count, (index) {
+    return dummyFeedItems[index % dummyFeedItems.length];
+  });
+}
+
 final List<FeedItemModel> dummyFeedItems = [
   FeedItemModel(
     name: "Kcct",

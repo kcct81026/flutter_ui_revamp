@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:yc_ui/constants/app_colors.dart';
 import 'package:yc_ui/constants/app_sizes.dart';

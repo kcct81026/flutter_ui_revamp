@@ -18,7 +18,7 @@ class FeedImageGrid extends StatelessWidget {
   final int maxGridItems;
 
   const FeedImageGrid({
-    Key? key,
+    super.key,
     this.images,
     this.imageUrl,
     this.spacing = AppSizes.paddingFour / 2,
@@ -28,8 +28,7 @@ class FeedImageGrid extends StatelessWidget {
   }) : assert(
          images != null || imageUrl != null,
          'Either images or imageUrl must be provided',
-       ),
-       super(key: key);
+       );
 
   List<String> get _resolvedImages {
     if (images != null && images!.isNotEmpty) return images!;

@@ -8,15 +8,40 @@ import 'package:yc_ui/social_feed/social_feed_header.dart';
 import 'package:yc_ui/widgets/app_text.dart';
 import 'package:yc_ui/widgets/expandable_text_widget.dart';
 
-class SocialFeedScreen extends StatelessWidget {
-  final List<FeedItemModel> items; // supply your feed data
+class SocialFeedScreen extends StatefulWidget {
+  final List<FeedItemModel> items;
 
-  const SocialFeedScreen({Key? key, required this.items}) : super(key: key);
+  const SocialFeedScreen({super.key, required this.items});
+
+  @override
+  State<SocialFeedScreen> createState() => _SocialFeedScreenState();
+}
+
+class _SocialFeedScreenState extends State<SocialFeedScreen> {
+  late final ScrollController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = ScrollController();
+
+    _controller.addListener(() {
+      //debugPrint("Scroll offset: ${_controller.offset}");
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        controller: _controller,
         slivers: [
           SliverAppBar(
             pinned: true,
@@ -31,61 +56,63 @@ class SocialFeedScreen extends StatelessWidget {
           // The feed list: use SliverList.builder for performance
           SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
-              final item = items[index];
+              final item = widget.items[index];
               // Build your full feed item widget. Here we use the header we created earlier
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSizes.paddingEight,
-                  horizontal: AppSizes.paddingSixteen,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _widgetHeader(item),
+              return RepaintBoundary(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSizes.paddingEight,
+                    horizontal: AppSizes.paddingSixteen,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _widgetHeader(item),
 
-                    if (item.text != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: AppSizes.paddingEight,
+                      if (item.text != null)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: AppSizes.paddingEight,
+                          ),
+                          child: ExpandableTextWidget(
+                            text: item.text!,
+                            fontSize: AppSizes.regular,
+                            color: AppColors.textColor,
+                            isBold: false,
+                            maxLines: 3,
+                          ),
                         ),
-                        child: ExpandableTextWidget(
-                          text: item.text!,
-                          fontSize: AppSizes.regular,
-                          color: AppColors.textColor,
-                          isBold: false,
-                          maxLines: 3,
+
+                      if (item.images.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(top: AppSizes.paddingTwelve),
+                          child: FeedImageGrid(images: item.images),
+                        ),
+
+                      const SizedBox(height: 12),
+
+                      // actions row (likes, comments)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 56.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.thumb_up_alt_outlined, size: 18),
+                            const SizedBox(width: 8),
+                            Text('${item.likes}'),
+                            const SizedBox(width: 24),
+                            Icon(Icons.comment_outlined, size: 18),
+                            const SizedBox(width: 8),
+                            Text('${item.comments}'),
+                          ],
                         ),
                       ),
 
-                    if (item.images.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.only(top: AppSizes.paddingTwelve),
-                        child: FeedImageGrid(images: item.images),
-                      ),
-
-                    const SizedBox(height: 12),
-
-                    // actions row (likes, comments)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 56.0),
-                      child: Row(
-                        children: [
-                          Icon(Icons.thumb_up_alt_outlined, size: 18),
-                          const SizedBox(width: 8),
-                          Text('${item.likes}'),
-                          const SizedBox(width: 24),
-                          Icon(Icons.comment_outlined, size: 18),
-                          const SizedBox(width: 8),
-                          Text('${item.comments}'),
-                        ],
-                      ),
-                    ),
-
-                    const Divider(),
-                  ],
+                      const Divider(),
+                    ],
+                  ),
                 ),
               );
-            }, childCount: items.length),
+            }, childCount: widget.items.length),
           ),
 
           // Optional: a footer to fill remaining space

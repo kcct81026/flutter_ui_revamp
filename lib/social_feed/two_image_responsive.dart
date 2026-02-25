@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yc_ui/social_feed/responsive_cache_image.dart';
+import 'package:yc_ui/widgets/feed_image_tile.dart';
 
 class TwoImageResponsive extends StatefulWidget {
   final List<String> urls;
@@ -10,15 +11,14 @@ class TwoImageResponsive extends StatefulWidget {
   final String? heroTagPrefix;
 
   const TwoImageResponsive({
-    Key? key,
+    super.key,
     required this.urls,
     required this.borderRadius,
     required this.fallbackAssetPath,
     required this.onTap,
     required this.spacing,
     this.heroTagPrefix,
-  }) : assert(urls.length == 2, 'TwoImageResponsive requires exactly 2 urls'),
-       super(key: key);
+  }) : assert(urls.length == 2, 'TwoImageResponsive requires exactly 2 urls');
 
   @override
   State<TwoImageResponsive> createState() => TwoImageResponsiveState();
@@ -140,18 +140,14 @@ class TwoImageResponsiveState extends State<TwoImageResponsive> {
                 return SizedBox(
                   width: w,
                   height: h,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                    child: ResponsiveCachedImage(
-                      url: widget.urls[0],
-                      borderRadius: widget.borderRadius,
-                      fallbackAssetPath: widget.fallbackAssetPath,
-                      onTap: () => widget.onTap(0),
-                      fit: BoxFit.cover,
-                      heroTag: _heroTagFor(0),
-                      width: w,
-                      height: h,
-                    ),
+                  child: buildFeedImageTile(
+                    url: widget.urls[0],
+                    width: w,
+                    height: h,
+                    borderRadius: widget.borderRadius,
+                    fallbackAssetPath: widget.fallbackAssetPath,
+                    onTap: () => widget.onTap(0),
+                    heroTag: _heroTagFor(0),
                   ),
                 );
               },
@@ -164,18 +160,14 @@ class TwoImageResponsiveState extends State<TwoImageResponsive> {
                 return SizedBox(
                   width: w,
                   height: h,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                    child: ResponsiveCachedImage(
-                      url: widget.urls[1],
-                      borderRadius: widget.borderRadius,
-                      fallbackAssetPath: widget.fallbackAssetPath,
-                      onTap: () => widget.onTap(1),
-                      fit: BoxFit.cover,
-                      heroTag: _heroTagFor(1),
-                      width: w,
-                      height: h,
-                    ),
+                  child: buildFeedImageTile(
+                    url: widget.urls[1],
+                    width: w,
+                    height: h,
+                    borderRadius: widget.borderRadius,
+                    fallbackAssetPath: widget.fallbackAssetPath,
+                    onTap: () => widget.onTap(1),
+                    heroTag: _heroTagFor(1),
                   ),
                 );
               },
@@ -191,10 +183,13 @@ class TwoImageResponsiveState extends State<TwoImageResponsive> {
       child: Row(
         children: [
           Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(widget.borderRadius),
-              child: AspectRatio(
-                aspectRatio: aspectForRow,
+            child: AspectRatio(
+              aspectRatio: aspectForRow,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
+                ),
+                clipBehavior: Clip.hardEdge,
                 child: ResponsiveCachedImage(
                   url: widget.urls[0],
                   borderRadius: widget.borderRadius,
@@ -208,10 +203,13 @@ class TwoImageResponsiveState extends State<TwoImageResponsive> {
           ),
           SizedBox(width: widget.spacing),
           Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(widget.borderRadius),
-              child: AspectRatio(
-                aspectRatio: aspectForRow,
+            child: AspectRatio(
+              aspectRatio: aspectForRow,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
+                ),
+                clipBehavior: Clip.hardEdge,
                 child: ResponsiveCachedImage(
                   url: widget.urls[1],
                   borderRadius: widget.borderRadius,

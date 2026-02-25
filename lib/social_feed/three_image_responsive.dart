@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yc_ui/social_feed/responsive_cache_image.dart';
+import 'package:yc_ui/widgets/feed_image_tile.dart';
 
 class ThreeImageResponsive extends StatefulWidget {
   final List<String> urls;
@@ -10,15 +11,14 @@ class ThreeImageResponsive extends StatefulWidget {
   final String? heroTagPrefix;
 
   const ThreeImageResponsive({
-    Key? key,
+    super.key,
     required this.urls,
     required this.borderRadius,
     required this.fallbackAssetPath,
     required this.onTap,
     required this.spacing,
     this.heroTagPrefix,
-  }) : assert(urls.length == 3, 'ThreeImageResponsive requires exactly 3 urls'),
-       super(key: key);
+  }) : assert(urls.length == 3, 'ThreeImageResponsive requires exactly 3 urls');
 
   @override
   State<ThreeImageResponsive> createState() => _ThreeImageResponsiveState();
@@ -162,18 +162,14 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
                 SizedBox(
                   width: leftWidth,
                   height: finalLeftHeight,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                    child: ResponsiveCachedImage(
-                      url: widget.urls[0],
-                      borderRadius: widget.borderRadius,
-                      fallbackAssetPath: widget.fallbackAssetPath,
-                      onTap: () => widget.onTap(0),
-                      fit: BoxFit.cover,
-                      heroTag: _heroTagFor(0),
-                      width: leftWidth,
-                      height: finalLeftHeight,
-                    ),
+                  child: buildFeedImageTile(
+                    url: widget.urls[0],
+                    width: leftWidth,
+                    height: finalLeftHeight,
+                    borderRadius: widget.borderRadius,
+                    fallbackAssetPath: widget.fallbackAssetPath,
+                    onTap: () => widget.onTap(0),
+                    heroTag: _heroTagFor(0),
                   ),
                 ),
 
@@ -188,40 +184,28 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
                       SizedBox(
                         width: rightWidth,
                         height: rightImageHeight,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            widget.borderRadius,
-                          ),
-                          child: ResponsiveCachedImage(
-                            url: widget.urls[1],
-                            borderRadius: widget.borderRadius,
-                            fallbackAssetPath: widget.fallbackAssetPath,
-                            onTap: () => widget.onTap(1),
-                            fit: BoxFit.cover,
-                            heroTag: _heroTagFor(1),
-                            width: rightWidth,
-                            height: rightImageHeight,
-                          ),
+                        child: buildFeedImageTile(
+                          url: widget.urls[1],
+                          width: rightWidth,
+                          height: rightImageHeight,
+                          borderRadius: widget.borderRadius,
+                          fallbackAssetPath: widget.fallbackAssetPath,
+                          onTap: () => widget.onTap(1),
+                          heroTag: _heroTagFor(1),
                         ),
                       ),
                       SizedBox(height: s),
                       SizedBox(
                         width: rightWidth,
                         height: rightImageHeight,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            widget.borderRadius,
-                          ),
-                          child: ResponsiveCachedImage(
-                            url: widget.urls[2],
-                            borderRadius: widget.borderRadius,
-                            fallbackAssetPath: widget.fallbackAssetPath,
-                            onTap: () => widget.onTap(2),
-                            fit: BoxFit.cover,
-                            heroTag: _heroTagFor(2),
-                            width: rightWidth,
-                            height: rightImageHeight,
-                          ),
+                        child: buildFeedImageTile(
+                          url: widget.urls[2],
+                          width: rightWidth,
+                          height: rightImageHeight,
+                          borderRadius: widget.borderRadius,
+                          fallbackAssetPath: widget.fallbackAssetPath,
+                          onTap: () => widget.onTap(2),
+                          heroTag: _heroTagFor(2),
                         ),
                       ),
                     ],
@@ -242,18 +226,14 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
                 SizedBox(
                   width: totalWidth,
                   height: topHeight,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                    child: ResponsiveCachedImage(
-                      url: widget.urls[0],
-                      borderRadius: widget.borderRadius,
-                      fallbackAssetPath: widget.fallbackAssetPath,
-                      onTap: () => widget.onTap(0),
-                      fit: BoxFit.cover,
-                      heroTag: _heroTagFor(0),
-                      width: totalWidth,
-                      height: topHeight,
-                    ),
+                  child: buildFeedImageTile(
+                    url: widget.urls[0],
+                    width: totalWidth,
+                    height: topHeight,
+                    borderRadius: widget.borderRadius,
+                    fallbackAssetPath: widget.fallbackAssetPath,
+                    onTap: () => widget.onTap(0),
+                    heroTag: _heroTagFor(0),
                   ),
                 ),
                 SizedBox(height: s),
@@ -262,40 +242,28 @@ class _ThreeImageResponsiveState extends State<ThreeImageResponsive> {
                     SizedBox(
                       width: bottomChildWidth,
                       height: bottomChildHeight,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          widget.borderRadius,
-                        ),
-                        child: ResponsiveCachedImage(
-                          url: widget.urls[1],
-                          borderRadius: widget.borderRadius,
-                          fallbackAssetPath: widget.fallbackAssetPath,
-                          onTap: () => widget.onTap(1),
-                          fit: BoxFit.cover,
-                          heroTag: _heroTagFor(1),
-                          width: bottomChildWidth,
-                          height: bottomChildHeight,
-                        ),
+                      child: buildFeedImageTile(
+                        url: widget.urls[1],
+                        width: bottomChildWidth,
+                        height: bottomChildHeight,
+                        borderRadius: widget.borderRadius,
+                        fallbackAssetPath: widget.fallbackAssetPath,
+                        onTap: () => widget.onTap(1),
+                        heroTag: _heroTagFor(1),
                       ),
                     ),
                     SizedBox(width: s),
                     SizedBox(
                       width: bottomChildWidth,
                       height: bottomChildHeight,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          widget.borderRadius,
-                        ),
-                        child: ResponsiveCachedImage(
-                          url: widget.urls[2],
-                          borderRadius: widget.borderRadius,
-                          fallbackAssetPath: widget.fallbackAssetPath,
-                          onTap: () => widget.onTap(2),
-                          fit: BoxFit.cover,
-                          heroTag: _heroTagFor(2),
-                          width: bottomChildWidth,
-                          height: bottomChildHeight,
-                        ),
+                      child: buildFeedImageTile(
+                        url: widget.urls[2],
+                        width: bottomChildWidth,
+                        height: bottomChildHeight,
+                        borderRadius: widget.borderRadius,
+                        fallbackAssetPath: widget.fallbackAssetPath,
+                        onTap: () => widget.onTap(2),
+                        heroTag: _heroTagFor(2),
                       ),
                     ),
                   ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yc_ui/social_feed/responsive_cache_image.dart';
+import 'package:yc_ui/widgets/feed_image_tile.dart';
 
 class FourImageResponsive extends StatefulWidget {
   final List<String> urls;
@@ -10,15 +11,14 @@ class FourImageResponsive extends StatefulWidget {
   final String? heroTagPrefix;
 
   const FourImageResponsive({
-    Key? key,
+    super.key,
     required this.urls,
     required this.borderRadius,
     required this.fallbackAssetPath,
     required this.onTap,
     required this.spacing,
     this.heroTagPrefix,
-  }) : assert(urls.length == 4, 'FourImageResponsive requires exactly 4 urls'),
-       super(key: key);
+  }) : assert(urls.length == 4, 'FourImageResponsive requires exactly 4 urls');
 
   @override
   State<FourImageResponsive> createState() => _FourImageResponsiveState();
@@ -149,40 +149,28 @@ class _FourImageResponsiveState extends State<FourImageResponsive> {
                     SizedBox(
                       width: childW,
                       height: childH,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          widget.borderRadius,
-                        ),
-                        child: ResponsiveCachedImage(
-                          url: widget.urls[0],
-                          borderRadius: widget.borderRadius,
-                          fallbackAssetPath: widget.fallbackAssetPath,
-                          onTap: () => widget.onTap(0),
-                          fit: BoxFit.cover,
-                          heroTag: _heroTagFor(0),
-                          width: childW,
-                          height: childH,
-                        ),
+                      child: buildFeedImageTile(
+                        url: widget.urls[0],
+                        width: childW,
+                        height: childH,
+                        borderRadius: widget.borderRadius,
+                        fallbackAssetPath: widget.fallbackAssetPath,
+                        onTap: () => widget.onTap(0),
+                        heroTag: _heroTagFor(0),
                       ),
                     ),
                     SizedBox(width: s),
                     SizedBox(
                       width: childW,
                       height: childH,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          widget.borderRadius,
-                        ),
-                        child: ResponsiveCachedImage(
-                          url: widget.urls[1],
-                          borderRadius: widget.borderRadius,
-                          fallbackAssetPath: widget.fallbackAssetPath,
-                          onTap: () => widget.onTap(1),
-                          fit: BoxFit.cover,
-                          heroTag: _heroTagFor(1),
-                          width: childW,
-                          height: childH,
-                        ),
+                      child: buildFeedImageTile(
+                        url: widget.urls[1],
+                        width: childW,
+                        height: childH,
+                        borderRadius: widget.borderRadius,
+                        fallbackAssetPath: widget.fallbackAssetPath,
+                        onTap: () => widget.onTap(1),
+                        heroTag: _heroTagFor(1),
                       ),
                     ),
                   ],
@@ -193,40 +181,28 @@ class _FourImageResponsiveState extends State<FourImageResponsive> {
                     SizedBox(
                       width: childW,
                       height: childH,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          widget.borderRadius,
-                        ),
-                        child: ResponsiveCachedImage(
-                          url: widget.urls[2],
-                          borderRadius: widget.borderRadius,
-                          fallbackAssetPath: widget.fallbackAssetPath,
-                          onTap: () => widget.onTap(2),
-                          fit: BoxFit.cover,
-                          heroTag: _heroTagFor(2),
-                          width: childW,
-                          height: childH,
-                        ),
+                      child: buildFeedImageTile(
+                        url: widget.urls[2],
+                        width: childW,
+                        height: childH,
+                        borderRadius: widget.borderRadius,
+                        fallbackAssetPath: widget.fallbackAssetPath,
+                        onTap: () => widget.onTap(2),
+                        heroTag: _heroTagFor(2),
                       ),
                     ),
                     SizedBox(width: s),
                     SizedBox(
                       width: childW,
                       height: childH,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          widget.borderRadius,
-                        ),
-                        child: ResponsiveCachedImage(
-                          url: widget.urls[3],
-                          borderRadius: widget.borderRadius,
-                          fallbackAssetPath: widget.fallbackAssetPath,
-                          onTap: () => widget.onTap(3),
-                          fit: BoxFit.cover,
-                          heroTag: _heroTagFor(3),
-                          width: childW,
-                          height: childH,
-                        ),
+                      child: buildFeedImageTile(
+                        url: widget.urls[3],
+                        width: childW,
+                        height: childH,
+                        borderRadius: widget.borderRadius,
+                        fallbackAssetPath: widget.fallbackAssetPath,
+                        onTap: () => widget.onTap(3),
+                        heroTag: _heroTagFor(3),
                       ),
                     ),
                   ],
@@ -256,18 +232,14 @@ class _FourImageResponsiveState extends State<FourImageResponsive> {
                 SizedBox(
                   width: leftWidth,
                   height: finalLeftHeight,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                    child: ResponsiveCachedImage(
-                      url: widget.urls[0],
-                      borderRadius: widget.borderRadius,
-                      fallbackAssetPath: widget.fallbackAssetPath,
-                      onTap: () => widget.onTap(0),
-                      fit: BoxFit.cover,
-                      heroTag: _heroTagFor(0),
-                      width: leftWidth,
-                      height: finalLeftHeight,
-                    ),
+                  child: buildFeedImageTile(
+                    url: widget.urls[0],
+                    width: leftWidth,
+                    height: finalLeftHeight,
+                    borderRadius: widget.borderRadius,
+                    fallbackAssetPath: widget.fallbackAssetPath,
+                    onTap: () => widget.onTap(0),
+                    heroTag: _heroTagFor(0),
                   ),
                 ),
                 SizedBox(width: s),
@@ -279,60 +251,42 @@ class _FourImageResponsiveState extends State<FourImageResponsive> {
                       SizedBox(
                         width: rightWidth,
                         height: rightSquareH,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            widget.borderRadius,
-                          ),
-                          child: ResponsiveCachedImage(
-                            url: widget.urls[1],
-                            borderRadius: widget.borderRadius,
-                            fallbackAssetPath: widget.fallbackAssetPath,
-                            onTap: () => widget.onTap(1),
-                            fit: BoxFit.cover,
-                            heroTag: _heroTagFor(1),
-                            width: rightWidth,
-                            height: rightSquareH,
-                          ),
+                        child: buildFeedImageTile(
+                          url: widget.urls[1],
+                          width: rightWidth,
+                          height: rightSquareH,
+                          borderRadius: widget.borderRadius,
+                          fallbackAssetPath: widget.fallbackAssetPath,
+                          onTap: () => widget.onTap(1),
+                          heroTag: _heroTagFor(1),
                         ),
                       ),
                       SizedBox(height: s),
                       SizedBox(
                         width: rightWidth,
                         height: rightSquareH,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            widget.borderRadius,
-                          ),
-                          child: ResponsiveCachedImage(
-                            url: widget.urls[2],
-                            borderRadius: widget.borderRadius,
-                            fallbackAssetPath: widget.fallbackAssetPath,
-                            onTap: () => widget.onTap(2),
-                            fit: BoxFit.cover,
-                            heroTag: _heroTagFor(2),
-                            width: rightWidth,
-                            height: rightSquareH,
-                          ),
+                        child: buildFeedImageTile(
+                          url: widget.urls[2],
+                          width: rightWidth,
+                          height: rightSquareH,
+                          borderRadius: widget.borderRadius,
+                          fallbackAssetPath: widget.fallbackAssetPath,
+                          onTap: () => widget.onTap(2),
+                          heroTag: _heroTagFor(2),
                         ),
                       ),
                       SizedBox(height: s),
                       SizedBox(
                         width: rightWidth,
                         height: rightSquareH,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            widget.borderRadius,
-                          ),
-                          child: ResponsiveCachedImage(
-                            url: widget.urls[3],
-                            borderRadius: widget.borderRadius,
-                            fallbackAssetPath: widget.fallbackAssetPath,
-                            onTap: () => widget.onTap(3),
-                            fit: BoxFit.cover,
-                            heroTag: _heroTagFor(3),
-                            width: rightWidth,
-                            height: rightSquareH,
-                          ),
+                        child: buildFeedImageTile(
+                          url: widget.urls[3],
+                          width: rightWidth,
+                          height: rightSquareH,
+                          borderRadius: widget.borderRadius,
+                          fallbackAssetPath: widget.fallbackAssetPath,
+                          onTap: () => widget.onTap(3),
+                          heroTag: _heroTagFor(3),
                         ),
                       ),
                     ],
@@ -354,18 +308,14 @@ class _FourImageResponsiveState extends State<FourImageResponsive> {
               SizedBox(
                 width: totalWidth,
                 height: topHeight,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(widget.borderRadius),
-                  child: ResponsiveCachedImage(
-                    url: widget.urls[0],
-                    borderRadius: widget.borderRadius,
-                    fallbackAssetPath: widget.fallbackAssetPath,
-                    onTap: () => widget.onTap(0),
-                    fit: BoxFit.cover,
-                    heroTag: _heroTagFor(0),
-                    width: totalWidth,
-                    height: topHeight,
-                  ),
+                child: buildFeedImageTile(
+                  url: widget.urls[0],
+                  width: totalWidth,
+                  height: topHeight,
+                  borderRadius: widget.borderRadius,
+                  fallbackAssetPath: widget.fallbackAssetPath,
+                  onTap: () => widget.onTap(0),
+                  heroTag: _heroTagFor(0),
                 ),
               ),
               SizedBox(height: s),
@@ -374,54 +324,42 @@ class _FourImageResponsiveState extends State<FourImageResponsive> {
                   SizedBox(
                     width: bottomChildWidth,
                     height: bottomChildHeight,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(widget.borderRadius),
-                      child: ResponsiveCachedImage(
-                        url: widget.urls[1],
-                        borderRadius: widget.borderRadius,
-                        fallbackAssetPath: widget.fallbackAssetPath,
-                        onTap: () => widget.onTap(1),
-                        fit: BoxFit.cover,
-                        heroTag: _heroTagFor(1),
-                        width: bottomChildWidth,
-                        height: bottomChildHeight,
-                      ),
+                    child: buildFeedImageTile(
+                      url: widget.urls[1],
+                      width: bottomChildWidth,
+                      height: bottomChildHeight,
+                      borderRadius: widget.borderRadius,
+                      fallbackAssetPath: widget.fallbackAssetPath,
+                      onTap: () => widget.onTap(1),
+                      heroTag: _heroTagFor(1),
                     ),
                   ),
                   SizedBox(width: s),
                   SizedBox(
                     width: bottomChildWidth,
                     height: bottomChildHeight,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(widget.borderRadius),
-                      child: ResponsiveCachedImage(
-                        url: widget.urls[2],
-                        borderRadius: widget.borderRadius,
-                        fallbackAssetPath: widget.fallbackAssetPath,
-                        onTap: () => widget.onTap(2),
-                        fit: BoxFit.cover,
-                        heroTag: _heroTagFor(2),
-                        width: bottomChildWidth,
-                        height: bottomChildHeight,
-                      ),
+                    child: buildFeedImageTile(
+                      url: widget.urls[2],
+                      width: bottomChildWidth,
+                      height: bottomChildHeight,
+                      borderRadius: widget.borderRadius,
+                      fallbackAssetPath: widget.fallbackAssetPath,
+                      onTap: () => widget.onTap(2),
+                      heroTag: _heroTagFor(2),
                     ),
                   ),
                   SizedBox(width: s),
                   SizedBox(
                     width: bottomChildWidth,
                     height: bottomChildHeight,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(widget.borderRadius),
-                      child: ResponsiveCachedImage(
-                        url: widget.urls[3],
-                        borderRadius: widget.borderRadius,
-                        fallbackAssetPath: widget.fallbackAssetPath,
-                        onTap: () => widget.onTap(3),
-                        fit: BoxFit.cover,
-                        heroTag: _heroTagFor(3),
-                        width: bottomChildWidth,
-                        height: bottomChildHeight,
-                      ),
+                    child: buildFeedImageTile(
+                      url: widget.urls[3],
+                      width: bottomChildWidth,
+                      height: bottomChildHeight,
+                      borderRadius: widget.borderRadius,
+                      fallbackAssetPath: widget.fallbackAssetPath,
+                      onTap: () => widget.onTap(3),
+                      heroTag: _heroTagFor(3),
                     ),
                   ),
                 ],

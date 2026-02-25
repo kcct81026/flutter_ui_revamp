@@ -9,11 +9,11 @@ class FullScreenGallery extends StatefulWidget {
   final String? fallbackAssetPath;
 
   const FullScreenGallery({
-    Key? key,
+    super.key,
     required this.urls,
     required this.initialIndex,
     this.fallbackAssetPath,
-  }) : super(key: key);
+  });
 
   @override
   State<FullScreenGallery> createState() => FullScreenGalleryState();
@@ -65,11 +65,12 @@ class FullScreenGalleryState extends State<FullScreenGallery> {
               placeholder: (ctx, url) =>
                   const Center(child: CircularProgressIndicator()),
               errorWidget: (ctx, url, error) {
-                if (widget.fallbackAssetPath != null)
+                if (widget.fallbackAssetPath != null) {
                   return Image.asset(
                     widget.fallbackAssetPath!,
                     fit: BoxFit.contain,
                   );
+                }
                 return Center(
                   child: Icon(
                     Icons.broken_image,

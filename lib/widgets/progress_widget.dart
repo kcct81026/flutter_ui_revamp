@@ -9,38 +9,35 @@ class ProgressBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final clampedProgress = progress.clamp(0.0, 1.0);
-    final remaining = 1.0 - clampedProgress;
+    final clamped = progress.clamp(0.0, 1.0);
+    final radius = BorderRadius.circular(AppSizes.paddingEight);
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(AppSizes.paddingEight),
-      child: Stack(
-        children: [
-          // Remaining background
-          Container(
-            height: AppSizes.paddingTwelve,
-            color: AppColors.progressBackground,
-          ),
-          // Progress fill
-          FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: clampedProgress,
-            child: Container(
-              height: AppSizes.paddingTwelve,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFFADEB6),
-                    Color(0xFFB2D7F9),
-                    Color(0xFFB2D7F9),
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+      borderRadius: radius,
+      child: SizedBox(
+        height: AppSizes.paddingTwelve,
+        child: Stack(
+          children: [
+            Container(color: AppColors.progressBackground),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FractionallySizedBox(
+                widthFactor: clamped,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFADEB6),
+                        Color(0xFFB2D7F9),
+                        Color(0xFFB2D7F9),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -14,8 +14,8 @@ class DynamicAspectSingleImage extends StatefulWidget {
     required this.fallbackAssetPath,
     required this.onTap,
     this.heroTag,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<DynamicAspectSingleImage> createState() =>
@@ -102,13 +102,16 @@ class DynamicAspectSingleImageState extends State<DynamicAspectSingleImage> {
 
     return AspectRatio(
       aspectRatio: ratio,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+        ),
+        clipBehavior: Clip.hardEdge,
         child: ResponsiveCachedImage(
           url: widget.url,
           borderRadius: widget.borderRadius,
           fallbackAssetPath: widget.fallbackAssetPath,
-          onTap: widget.onTap,
+          onTap: () => widget.onTap,
           fit: BoxFit.cover,
           heroTag: widget.heroTag,
         ),

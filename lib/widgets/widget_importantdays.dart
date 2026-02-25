@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:yc_ui/constants/app_colors.dart';
 import 'package:yc_ui/constants/app_sizes.dart';
-import 'package:yc_ui/constants/app_icons.dart';
 import 'package:yc_ui/constants/app_string.dart';
 import 'package:yc_ui/widgets/app_text.dart';
 import 'package:yc_ui/widgets/rounded_text_widget.dart';
-import 'package:yc_ui/widgets/rounded_text_with_icon.dart';
 
 class WidgetImportantdays extends StatefulWidget {
   const WidgetImportantdays({super.key});
