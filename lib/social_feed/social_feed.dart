@@ -53,11 +53,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
             ),
           ),
 
-          // The feed list: use SliverList.builder for performance
           SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
               final item = widget.items[index];
-              // Build your full feed item widget. Here we use the header we created earlier
               return RepaintBoundary(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(

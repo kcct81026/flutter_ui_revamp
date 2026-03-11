@@ -111,7 +111,7 @@ class DynamicAspectSingleImageState extends State<DynamicAspectSingleImage> {
           url: widget.url,
           borderRadius: widget.borderRadius,
           fallbackAssetPath: widget.fallbackAssetPath,
-          onTap: () => widget.onTap,
+          onTap: widget.onTap,
           fit: BoxFit.cover,
           heroTag: widget.heroTag,
         ),

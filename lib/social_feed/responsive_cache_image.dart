@@ -26,8 +26,12 @@ class ResponsiveCachedImage extends StatelessWidget {
     this.height,
   });
 
+  // Widget _placeholder() {
+  //   return const ShimmerBox();
+  // }
+
   Widget _placeholder() {
-    return const ShimmerBox();
+    return Container(color: Colors.grey);
   }
 
   Widget _errorWidget() {
@@ -52,29 +56,38 @@ class ResponsiveCachedImage extends StatelessWidget {
     Widget image = CachedNetworkImage(
       imageUrl: url,
       fit: fit,
+      width: width,
+      height: height,
+      memCacheWidth: width?.toInt(),
+      memCacheHeight: height?.toInt(),
       placeholder: (ctx, u) => _placeholder(),
       errorWidget: (ctx, u, err) => _errorWidget(),
-      fadeInDuration: const Duration(milliseconds: 200),
-      memCacheWidth: 800,
-      memCacheHeight: 800,
+      fadeInDuration: const Duration(milliseconds: 150),
     );
 
     if (onTap != null) {
-      image = GestureDetector(onTap: onTap, child: image);
+      image = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: image,
+      );
     }
 
     if (heroTag != null) {
       image = Hero(tag: heroTag!, child: image);
     }
 
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: image,
-    );
+    if (borderRadius > 0) {
+      return SizedBox(
+        width: width,
+        height: height,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: image,
+        ),
+      );
+    }
+
+    return SizedBox(width: width, height: height, child: image);
   }
 }

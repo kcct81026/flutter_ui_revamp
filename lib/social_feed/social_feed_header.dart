@@ -144,8 +144,6 @@ class SocialFeedHeader extends StatelessWidget {
       return _fallbackPlaceholder(size);
     }
 
-    // Use Image.network with loading/error builders to handle failures gracefully.
-    // On web, statusCode 0 often means CORS or network failure — errorBuilder covers that.
     return ClipOval(
       child: Image.network(
         profileImageUrl!,

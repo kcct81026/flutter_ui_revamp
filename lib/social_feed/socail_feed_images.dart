@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:yc_ui/constants/app_colors.dart';
 import 'package:yc_ui/constants/app_sizes.dart';
+import 'package:yc_ui/extensions/image_mapper.dart';
 import 'package:yc_ui/social_feed/four_image_responsive.dart';
 import 'package:yc_ui/social_feed/full_screen_image.dart';
 import 'package:yc_ui/social_feed/mutli_image_responsive.dart';
@@ -41,7 +40,7 @@ class FeedImageGrid extends StatelessWidget {
     final imgs = _resolvedImages;
     if (imgs.isEmpty) return const SizedBox.shrink();
 
-    // Single image -> dynamic aspect handled by _DynamicAspectSingleImage
+    // Single image
     if (imgs.length == 1) {
       return DynamicAspectSingleImage(
         url: imgs.first,
@@ -51,13 +50,13 @@ class FeedImageGrid extends StatelessWidget {
       );
     }
 
-    // Multiple images -> grid (special-case for exactly 2 images)
+    // Multiple images
     final displayed = imgs.take(maxGridItems).toList();
 
     // Special layout when exactly two images
     if (displayed.length == 2) {
       return TwoImageResponsive(
-        urls: displayed,
+        images: displayed.toFeedImages(),
         borderRadius: borderRadius,
         fallbackAssetPath: fallbackAssetPath,
         onTap: (index) => _openFullScreen(context, displayed, index),
@@ -68,7 +67,7 @@ class FeedImageGrid extends StatelessWidget {
     // Special layout when exactly three images
     if (displayed.length == 3) {
       return ThreeImageResponsive(
-        urls: displayed,
+        images: displayed.toFeedImages(),
         borderRadius: borderRadius,
         fallbackAssetPath: fallbackAssetPath,
         onTap: (index) => _openFullScreen(context, displayed, index),
@@ -79,7 +78,7 @@ class FeedImageGrid extends StatelessWidget {
     // Special layout when exactly four images
     if (displayed.length == 4) {
       return FourImageResponsive(
-        urls: displayed,
+        images: displayed.toFeedImages(),
         borderRadius: borderRadius,
         fallbackAssetPath: fallbackAssetPath,
         onTap: (index) => _openFullScreen(context, displayed, index),
@@ -88,7 +87,7 @@ class FeedImageGrid extends StatelessWidget {
     }
 
     return MultipleImageResponsive(
-      urls: displayed,
+      images: displayed.toFeedImages(),
       borderRadius: borderRadius,
       fallbackAssetPath: fallbackAssetPath,
       onTap: (index) => _openFullScreen(context, displayed, index),
